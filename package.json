@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "vueThink made by vue2.0",
   "scripts": {
-    "dev": "node build/dev-server.js",
+    "dev": "node build/dev-server.js --host 192.168.1.104",
+    "start": "npm run dev",
     "build": "node build/build.js"
   },
   "dependencies": {

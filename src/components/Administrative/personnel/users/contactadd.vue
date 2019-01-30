@@ -1,34 +1,74 @@
 <template>
-	<el-form ref="list" :model="list" label-width="100px">
-    <el-form-item label="姓" :label-width="formLabelWidth">
-      <el-input v-model="list.f_last_name" autocomplete="off"></el-input>
-    </el-form-item>
-    <el-form-item label="名" :label-width="formLabelWidth">
-      <el-input v-model="list.f_first_name" autocomplete="off"></el-input>
-    </el-form-item>
-    <el-form-item label="职位" :label-width="formLabelWidth">
-      <el-input v-model="list.f_user_position" autocomplete="off"></el-input>
-    </el-form-item>
-    <el-form-item label="电话" :label-width="formLabelWidth">
-      <el-input v-model="list.f_user_phone" autocomplete="off"></el-input>
-    </el-form-item>
-    <el-form-item label="邮箱" :label-width="formLabelWidth">
-      <el-input v-model="list.f_user_email" autocomplete="off"></el-input>
-    </el-form-item>
-    <el-form-item label="相关" :label-width="formLabelWidth">
-      <el-select v-model="list.f_user_role" placeholder="请选择">
-        <el-option
-          v-for="item in roles"
-          :key="item.id"
-          :label="item.name"
-          :value="item.id">
-        </el-option>
-      </el-select>
-    </el-form-item>
-    <el-form-item>
-      <el-button type="primary" @click="contact_create()">下一步</el-button>
-    </el-form-item>
-	</el-form>  
+	<div class="header">
+    联系人信息
+    <el-button class="add" size="mini" @click="contact_table_create()"><i class="el-icon-plus">添加</i></el-button>
+    <el-dialog title="联系人信息" :visible.sync="dialogFormVisible">
+      <el-form ref="list" :model="list" label-width="100px">
+        <el-form-item label="姓" :label-width="formLabelWidth">
+          <el-input v-model="list.f_last_name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="名" :label-width="formLabelWidth">
+          <el-input v-model="list.f_first_name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="职位" :label-width="formLabelWidth">
+          <el-input v-model="list.f_user_position" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话" :label-width="formLabelWidth">
+          <el-input v-model="list.f_user_phone" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" :label-width="formLabelWidth">
+          <el-input v-model="list.f_user_email" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="相关" :label-width="formLabelWidth">
+          <el-checkbox-group v-model="list.f_user_role" @change="handleCheckedRolesChange">
+            <el-checkbox v-for="item in roles" :label="item.id" :key="item.id">{{item.name}}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="contact_table_create_submit()">确定</el-button>
+          <el-button type="primary" @click="contact_table_cancel()">取消</el-button>
+        </el-form-item>
+      </el-form>   
+    </el-dialog>
+    <el-table
+    :data="listdata"
+    border
+    style="width:100%">
+      <el-table-column label="姓" width="" align="center">
+        <template scope="scope">
+          {{scope.row.f_last_name}}
+        </template>
+      </el-table-column>
+      <el-table-column label="名" width="" align="center">
+        <template scope="scope">
+          {{scope.row.f_first_name}}
+        </template>
+      </el-table-column>
+      <el-table-column label="职业" width="" align="center">
+        <template scope="scope">
+          <span>{{scope.row.f_user_position}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="电话"  align="center" width="">
+        <template scope="scope">
+          {{scope.row.f_user_phone}}
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="邮箱" width="">
+        <template scope="scope">
+          <span>{{scope.row.f_user_email}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center"  label="操作" width="150">
+        <template scope="scope">                          
+          <el-button size="mini" @click="table_edit(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="mini" type="danger" @click="table_delete(scope.$index, scope.row)">删除</el-button>           
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-button type="primary" @click="contact_create()">下一步</el-button>
+    <el-button type="primary" @click="contact_go()">返回</el-button>
+  </div> 
 </template>
 <script>
   import http from '../../../../assets/js/http'
@@ -38,22 +78,25 @@
     data() {
       return {
         roles: [{
-          id: 'Enterprise',
+          id: 'enterprise',
           name: '企业负责人'
         }, {
-          id: 'Financial',
+          id: 'financial',
           name: '财务负责人'
         }, {
-          id: 'Charge',
+          id: 'charge',
           name: '清算负责人'
         }],
+        dialogFormVisible: false,
+        checkedRoles: [],
+        listdata: [],
         list: {
           f_first_name: '',
           f_last_name: '',
           f_user_position: '',
           f_user_phone: '',
           f_user_email: '',
-          f_user_role: '',
+          f_user_role: [],
           f_group_code: ''
         }
       }
@@ -63,14 +106,62 @@
         this.list.f_group_code = this.$route.params.id
         console.log(this.list.f_group_code)
       },
+      init() {
+        this.list = {
+          f_first_name: '',
+          f_last_name: '',
+          f_user_position: '',
+          f_user_phone: '',
+          f_user_email: '',
+          f_user_role: [],
+          f_group_code: ''
+        }
+      },
+      contact_table_create() {
+        this.list = {}
+        this.init()
+        this.get_id()
+        this.dialogFormVisible = true
+      },
+      contact_table_cancel() {
+        this.list = {}
+        this.dialogFormVisible = false
+      },
+      contact_table_create_submit() {
+        this.listdata.push(this.list)
+        this.dialogFormVisible = false
+        console.log(this.listdata)
+        console.log(this.list.f_group_code)
+      },
+      table_edit(index, row) {
+        this.dialogFormVisible = true
+        this.list = Object.assign({}, row)
+        this.listdata.splice(index, 1)
+        this.get_id()
+      },
+      table_delete(index, row) {
+        this.listdata.splice(index, 1)
+      },
       contact_create() {
-        this.apiPost('contact/create', this.list).then((res) => {
+        this.apiPost('contact/create', this.listdata).then((res) => {
           this.handelResponse(res, (data) => {
+            console.log(this.listdata)
             _g.toastMsg('success', '编辑成功')
-            this.$router.push({ name: 'fdAdd', params: { id: this.list.f_group_code }})
+            this.$router.push({ name: 'fdAdd', params: { id: this.listdata[0].f_group_code }})
           })
         })
+      },
+      contact_go() {
+        this.$router.go(-1)
+      },
+      handleCheckedRolesChange(value) {
+        let checkcount = value.length
+        this.checkAll = checkcount === this.roles.length
       }
+    },
+    beforeRouteLeave(to, from, next) {
+      to.meta.keepAlive = true
+      next()
     },
     mounted() {
       this.get_id()
