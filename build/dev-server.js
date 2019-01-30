@@ -60,7 +60,7 @@ app.use(staticPath, express.static('./static'))
 
 app.use('/',proxyMiddleware(
   {
-    target: 'http://api.master.com/',
+    target: 'http://testapi.master.com/',
     changeOrigin: true
   }
 ))

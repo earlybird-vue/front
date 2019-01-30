@@ -97,7 +97,23 @@
         </template>
       </el-table-column>
     </el-table>
-    <div class="header">公司信息<el-button class="add"><i class="el-icon-plus">添加</i></el-button></div>
+    <div class="header">
+      公司信息
+      <el-button class="add" @click="customer_company_table()"><i class="el-icon-plus">添加</i></el-button></div>
+      <el-dialog title="公司信息" :visible.sync="dialogFormVisible4"> 
+        <el-form ref="form" :model="companyadd" label-width="130px">
+          <el-form-item label="公司中文名称" :label-width="formLabelWidth">
+            <el-input v-model="companyadd.f_name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="公司英文名称" :label-width="formLabelWidth">
+            <el-input v-model="companyadd.f_en_name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="company_cancel()">取消</el-button>
+            <el-button type="primary" @click="customer_company_create()">确定</el-button>
+          </el-form-item>
+        </el-form>
+      </el-dialog>  
     <el-table
       :data="company"
       style="width: 100%"
@@ -114,7 +130,7 @@
       </el-table-column>
       <el-table-column label="状态" width="">
         <template scope="scope">
-          {{scope.row.status}}
+          {{scope.row.status === 1 ? '激活':"禁用"}}
         </template>
       </el-table-column>
       <el-table-column label="操作">
@@ -137,132 +153,258 @@
       </template>
       </el-table-column>
     </el-table>
-    <div class="header">市场信息</div>
+    <div class="header">
+      市场信息
+      <el-button class="add" @click="table_market_create()"><i class="el-icon-plus">添加</i></el-button></div>
+      <el-dialog title="市场信息" :visible.sync="dialogFormVisible5">
+      <el-form ref="market" :model="market" :rules="rules" label-width="130px">
+        <el-form-item label="市场名称" :label-width="formLabelWidth">
+          <el-input v-model="market.f_market_name"></el-input>
+        </el-form-item>
+        <el-form-item label="所属公司" :label-width="formLabelWidth">
+          <el-select v-model="market.f_company_code" placeholder="请选择">
+            <el-option
+              v-for="item in company"
+              :key="item.company_code"
+              :label="item.name"
+              :value="item.company_code">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="币别" :label-width="formLabelWidth">
+          <el-select v-model="market.f_currency_name" placeholder="请选择">
+            <el-option
+              v-for="currecy in Cur"
+              :key="currecy.sign"
+              :label="currecy.name"
+              :value="currecy.name">
+            </el-option>
+          </el-select>
+          <el-select v-model="market.f_currency_sign" placeholder="请选择">
+            <el-option
+              v-for="currecy in Cur"
+              :key="currecy.sign"
+              :label="currecy.sign"
+              :value="currecy.sign">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="数据同步方式" :label-width="formLabelWidth">
+          <el-select v-model="market.f_sync_type" placeholder="请选择">
+            <el-option
+              v-for="item in way"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备注" :label-width="formLabelWidth">
+          <el-input
+            type="textarea"
+            :rows="2"
+            placeholder="请输入内容"
+            v-model="market.f_memo">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="清算负责人" :label-width="formLabelWidth">
+          <el-select v-model="market.f_charge_user_name" placeholder="请选择">
+            <el-option
+              v-for="item4 in charge"
+              :key="item4.contact_code"
+              :label="item4.user_name"
+              :value="item4.user_name">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="授权邮箱">
+          <el-button type="text" @click="table_market_create_authorize1()">添加</el-button><i class="el-icon-edit"></i>
+            <el-dialog title="邮箱列表" :visible.sync="dialogFormVisible6" append-to-body>
+              <el-form :model="market3">
+                <el-form-item label="邮箱选择" :label-width="formLabelWidth">
+                  <el-select v-model="market3.f_authorized" placeholder="请选择">
+                    <el-option
+                      v-for="yx in authorize"
+                      :key="yx.user_code"
+                      :label="yx.user_email"
+                      :value="yx">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible2 = false">取 消</el-button>
+          <el-button type="primary" @click="table_market_create_authorize_submit(yx)">确 定</el-button>
+        </div>
+      </el-dialog>
+      <el-table
+        :data="authordata"
+        border
+        style="width:100%">
+        <el-table-column
+          label="授权邮箱"
+          width="">
+          <template scope="scope">
+            <span>{{scope.row.user_email}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="邮箱拥有者"
+          width="">
+          <template scope="scope">
+            <span>{{scope.row.user_name}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="邮箱拥有者手机"
+          width="">
+          <template scope="scope">
+            <span>{{scope.row.user_phone}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center"  label="操作" width="">
+            <template scope="scope">                          
+              <el-button size="mini" @click="table_delete(scope.$index, scope.row)">删除</el-button>            
+            </template>
+        </el-table-column>
+      </el-table>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="customer_market_create()">完成</el-button>
+      </el-form-item>
+    </el-form>
+    </el-dialog>
     <el-table
-      :data="customer.market"
+      :data="market1"
       border
       style="width:100%">
       <el-table-column label="#Id" width="">
         <template scope="scope">
-          {{scope.row.Id}}
+          {{scope.row.market_code}}
         </template>
       </el-table-column>
       <el-table-column label="状态" width="">
         <template scope="scope">
-          {{scope.row.CompanyStatus}}
+          {{scope.row.status === 0 ? '正常活跃':"不活跃"}}
         </template>
       </el-table-column>
       <el-table-column label="所属公司" width="">
         <template scope="scope">
-          <span>{{scope.row.CompanyDivision}}</span>
+          <span>{{scope.row.company_code}}</span>
         </template>
       </el-table-column>
       <el-table-column label="市场名称"  align="center" width="">
         <template scope="scope">
-          {{scope.row.CompanyDivision}}
+          {{scope.row.market_name}}
         </template>
       </el-table-column>
       <el-table-column align="center" label="币别" width="">
         <template scope="scope">
-          <span>{{scope.row.CurrencyName}}</span>
+          <span>{{scope.row.currency_name}}</span>
         </template>
       </el-table-column>
       <el-table-column
-        label="发票更新"
+        label="更新方式"
         width="100">
         <template scope="scope">
-          <span>{{scope.row.SyncInvoiceType}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="供应商更新" width="">
-        <template scope="scope">
-          <span>{{scope.row.SyncVendorType}}</span>
+          <span>{{scope.row.sync_type === 0 ? '自动' : '手动'}}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="清算负责人" width="">
         <template scope="scope">
-          <span>{{scope.row.UserName}}</span>
+          <span>{{scope.row.charge_user_name}}</span>
         </template>
       </el-table-column>
       <el-table-column align="center"  label="操作" width="150">
         <template scope="scope">                          
-          <el-button size="mini" @click="customer_market_read(scope.$index, scope.row)">编辑</el-button>
-            <el-dialog title="市场信息" :visible.sync="dialogFormVisible3" append-to-body>
-              <el-form :model="market1">
-              <el-form-item label="市场名称" :label-width="formLabelWidth">
-                <el-input v-model="market1.CompanyDivision"></el-input>
+          <el-button size="mini" @click="customer_market_edit(scope.$index, scope.row)">编辑</el-button>
+            <el-dialog title="市场信息" :visible.sync="dialogFormVisible7">
+              <el-form ref="market2" :model="market2" label-width="130px">
+                <el-form-item label="市场名称" :label-width="formLabelWidth">
+                  <el-input v-model="market2.market_name"></el-input>
+                </el-form-item>
+                <el-form-item label="所属公司" :label-width="formLabelWidth">
+                  <el-select v-model="market2.company_code" placeholder="请选择">
+                    <el-option
+                      v-for="item in company"
+                      :key="item.company_code"
+                      :label="item.name"
+                      :value="item.company_code">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="币别" :label-width="formLabelWidth">
+                  <el-select v-model="market2.currency_name" placeholder="请选择">
+                    <el-option
+                      v-for="currecy in Cur"
+                      :key="currecy.sign"
+                      :label="currecy.name"
+                      :value="currecy.name">
+                    </el-option>
+                  </el-select>
+                  <el-select v-model="market2.currency_sign" placeholder="请选择">
+                    <el-option
+                      v-for="currecy in Cur"
+                      :key="currecy.sign"
+                      :label="currecy.sign"
+                      :value="currecy.sign">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="数据同步方式" :label-width="formLabelWidth">
+                  <el-select v-model="market2.sync_type" placeholder="请选择">
+                    <el-option
+                      v-for="item in way"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="备注" :label-width="formLabelWidth">
+                  <el-input
+                    type="textarea"
+                    :rows="2"
+                    placeholder="请输入内容"
+                    v-model="market2.memo">
+                  </el-input>
+                </el-form-item>
+                <el-form-item label="清算负责人" :label-width="formLabelWidth">
+                  <el-select v-model="market2.charge_user_name" placeholder="请选择">
+                    <el-option
+                      v-for="item4 in charge"
+                      :key="item4.contact_code"
+                      :label="item4.user_name"
+                      :value="item4.user_name">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="授权邮箱">
+                  <el-button type="text" @click="table_market_create_authorize1()">添加</el-button><i class="el-icon-edit"></i>
+              <el-table
+                :data="market2.authorized_user_codes"
+                border
+                style="width:100%">
+                <el-table-column
+                  label="授权邮箱编号"
+                  width="">
+                  <template scope="scope">
+                    <span>{{scope.row}}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column align="center"  label="操作" width="">
+                    <template scope="scope">                          
+                      <el-button size="mini" @click="table_edit(scope.$index, scope.row)">编辑</el-button>
+                      <el-button size="mini" @click="table_delete(scope.$index, scope.row)">删除</el-button>            
+                    </template>
+                </el-table-column>
+              </el-table>
               </el-form-item>
-              <el-form-item label="币别" :label-width="formLabelWidth">
-                      <el-select v-model="market1.CurrencyName " placeholder="请选择">
-                        <el-option
-                          v-for="currecy in customer.cur"
-                          :key="currecy.sign"
-                          :label="currecy.name"
-                          :value="currecy.name">
-                        </el-option>
-                      </el-select>
-                      <el-select v-model="market1.CurrencySign " placeholder="请选择">
-                        <el-option
-                          v-for="currecy in customer.cur"
-                          :key="currecy.sign"
-                          :label="currecy.sign"
-                          :value="currecy.sign">
-                        </el-option>
-                      </el-select>
-              </el-form-item>
-              <el-form-item label="发票更新方式" :label-width="formLabelWidth">
-                      <el-select v-model="market1.SyncInvoiceType" placeholder="请选择">
-                        <el-option
-                          v-for="item4 in options6"
-                          :key="item4.id"
-                          :label="item4.name"
-                          :value="item4.id">
-                        </el-option>
-                      </el-select>
-              </el-form-item>
-              <el-form-item label="发票更新日期" :label-width="formLabelWidth">
-                <el-input v-model="market1.SyncInvoiceDate"></el-input>
-              </el-form-item>
-              <el-form-item label="供应商更新时间" :label-width="formLabelWidth">
-                <el-input v-model="market1.SyncVendorDate"></el-input>
-              </el-form-item>
-              <el-form-item label="供应商更新方式" :label-width="formLabelWidth">
-                      <el-select v-model="market1.SyncVendorType" placeholder="请选择">
-                        <el-option
-                          v-for="item in options6"
-                          :key="item.id"
-                          :label="item.name"
-                          :value="item.id">
-                        </el-option>
-                      </el-select>
-              </el-form-item>
-              <el-form-item label="企业对账日" :label-width="formLabelWidth">
-                <el-input v-model="market1.ReconciliationDate"></el-input>
-              </el-form-item>
-              <el-form-item label="备注" :label-width="formLabelWidth">
-                <el-input
-                  type="textarea"
-                  :rows="2"
-                  placeholder="请输入内容"
-                  v-model="market1.Memo">
-                </el-input>
-              </el-form-item>
-              <el-form-item label="市场清算负责人" :label-width="formLabelWidth">
-                      <el-select v-model="market1.UserName" placeholder="请选择">
-                        <el-option
-                          v-for="item4 in customer.charge"
-                          :key="item4.Uid"
-                          :label="item4.UserName"
-                          :value="item4.UserName">
-                        </el-option>
-                      </el-select>
-              </el-form-item>
-            </el-form>
-            <div slot="footer" class="dialog-footer">
-              <el-button @click="dialogFormVisible3 = false">取 消</el-button>
-              <el-button type="primary" @click="customer_market_update()">确 定</el-button>
-            </div>
-            </el-dialog>           
+              <el-form-item>
+                <el-button type="primary" @click="customer_market_create()">完成</el-button>
+              </el-form-item>          
+          </el-form>
+          </el-dialog>           
         </template>
       </el-table-column>
     </el-table>
@@ -302,9 +444,20 @@
       return {
         isLoading: false,
         dialogFormVisible: false,
+        dialogFormVisible4: false,
+        dialogFormVisible5: false,
+        dialogFormVisible6: false,
+        dialogFormVisible7: false,
         dialogFormVisible2: false,
         dialogFormVisible3: false,
+        companyadd: {
+          f_name: '',
+          f_en_name: '',
+          f_group_code: ''
+        },
+        companydata: [],
         id: null,
+        company_id: null,
         options6: [
           {
             id: 0,
@@ -318,13 +471,48 @@
         customer: [],
         list: '',
         company: [],
+        company2: {},
         company1: {
-          f_code: '',
           f_name: '',
           f_en_name: '',
+          f_code: '',
           f_status: ''
         },
-        market1: {}
+        market: {
+          f_group_code: '',
+          f_company_code: '',
+          f_market_name: '',
+          f_currency_name: '',
+          f_currency_sign: '',
+          f_sync_type: '',
+          f_memo: '',
+          f_charge_contact_code: '',
+          f_charge_user_name: '',
+          f_authorized_user_code: []
+        },
+        way: [{
+          id: '0',
+          name: '自动'
+        }, {
+          id: '1',
+          name: '手动'
+        }],
+        Cur: [{
+          sign: '¥',
+          name: 'RMB'
+        }, {
+          sign: '$',
+          name: 'USD'
+        }],
+        market1: [],
+        market_id: '',
+        market2: '',
+        charge: [],
+        authordata: [],
+        marketdata: [],
+        market3: {
+          f_authorized: ''
+        }
       }
     },
     methods: {
@@ -340,8 +528,34 @@
           })
         })
       },
+      get_id() {
+        this.market.f_group_code = this.$route.params.id
+      },
+      get_company_list() {
+        this.apiGet('company/list/' + this.market.f_group_code).then((res) => {
+          this.handelResponse(res, (data) => {
+            this.company = res.data.list
+          })
+        })
+      },
+      get_charge() {
+        this.apiGet('contact/getCharge/' + this.market.f_group_code).then((res) => {
+          this.handelResponse(res, (data) => {
+            this.charge = res.data.charge_list
+            this.authorize = res.data.emails_list
+          })
+        })
+      },
+      get_simple_list() {
+        this.apiGet('contact/simplelist/' + this.market2.group_code).then((res) => {
+          this.handelResponse(res, (data) => {
+            this.authorize = res.data
+            console.log(this.authorize)
+          })
+        })
+      },
       customer_save(index, row) {
-        this.list = this.customer.group
+        this.list = this.customer.info
         this.list = Object.assign({}, row)
         this.dialogFormVisible = true
       },
@@ -359,22 +573,55 @@
         this.apiGet('company/list/' + this.id).then((res) => {
           this.handelResponse(res, (data) => {
             this.company = res.data.list
+            this.company_id = res.data.list[0].company_code
+            this.customer_market_read()
+          })
+        })
+      },
+      company_init() {
+        this.companyadd = {
+          f_name: '',
+          f_en_name: '',
+          f_group_code: ''
+        }
+      },
+      customer_company_table() {
+        this.companyadd = {}
+        this.company_init()
+        this.companyadd.f_group_code = this.id
+        this.dialogFormVisible4 = true
+      },
+      customer_company_cancel() {
+        this.companyadd = {}
+        this.dialogFormVisible4 = false
+      },
+      customer_company_create() {
+        this.companydata.push(this.companyadd)
+        this.apiPost('company/create', this.companydata).then((res) => {
+          this.handelResponse(res, (data) => {
+            _g.toastMsg('success', '添加成功')
+            this.customer_company_read()
             console.log(this.company)
+            this.dialogFormVisible4 = false
           })
         })
       },
       customer_company_edit(index, row) {
-        this.company1.f_code = this.company.company_code
-        this.company1.f_name = this.company.name
-        this.company1.f_en_name = this.company.en_name
-        this.company1.f_status = this.company.status
-        console.log(this.company1)
-        this.company1 = Object.assign({}, row)
-        this.dialogFormVisible2 = true
+        this.apiGet('company/get/' + this.company_id).then((res) => {
+          this.handelResponse(res, (data) => {
+            this.company1 = res.data
+            console.log(this.company1)
+            this.dialogFormVisible2 = true
+            this.company1 = Object.assign({}, row)
+          })
+        })
       },
       customer_company_update() {
-        this.isLoading = !this.isLoading
-        this.apiPost('company/update', this.company1).then((res) => {
+        this.company2.f_name = this.company1.name
+        this.company2.f_en_name = this.company1.en_name
+        this.company2.f_code = this.company1.company_code
+        this.company2.f_status = this.company1.status
+        this.apiPost('company/update', this.company2).then((res) => {
           this.handelResponse(res, (data) => {
             _g.toastMsg('success', '修改成功')
             this.customer_company_read()
@@ -382,17 +629,94 @@
           })
         })
       },
+      customer_market_read() {
+        console.log(this.company_id)
+        this.apiGet('market/list/' + this.company_id).then((res) => {
+          this.handelResponse(res, (data) => {
+            this.market1 = res.data.list
+          })
+        })
+      },
+      market_init() {
+        this.market = {
+          f_group_code: '',
+          f_company_code: '',
+          f_market_name: '',
+          f_currency_name: '',
+          f_currency_sign: '',
+          f_sync_type: '',
+          f_memo: '',
+          f_charge_user_name: '',
+          f_authorized_user_code: []
+        }
+      },
+      table_market_create() {
+        this.market = {}
+        this.authordata = []
+        this.market_init()
+        this.get_id()
+        this.get_company_list()
+        this.get_charge()
+        this.dialogFormVisible5 = true
+      },
+      authorize_init() {
+        this.market3 = {
+          f_authorized: ''
+        }
+      },
+      table_market_create_authorize1() {
+        this.market3 = {}
+        this.authorize_init()
+        this.dialogFormVisible6 = true
+      },
+      table_market_create_authorize_submit() {
+        if (this.authordata.indexOf(this.market3.f_authorized) === -1) {
+          this.authordata.push(this.market3.f_authorized)
+          this.dialogFormVisible6 = false
+        } else {
+          alert('此邮箱已经授权')
+        }
+      },
+      table_edit(index, row) {
+        this.dialogFormVisible6 = true
+        this.market3 = Object.assign({}, row)
+        this.authordata.splice(index, 1)
+      },
+      table_delete(index) {
+        this.authordata.splice(index, 1)
+      },
+      customer_market_create() {
+        for (let i = 0; i < this.authordata.length; i++) {
+          this.market.f_authorized_user_code.push(this.authordata[i].user_code)
+        }
+        this.marketdata.push(this.market)
+        this.apiPost('market/create', this.marketdata).then((res) => {
+          this.handelResponse(res, (data) => {
+            _g.toastMsg('success', '编辑成功')
+            this.customer_market_read()
+            this.dialogFormVisible5 = false
+          })
+        })
+      },
       customer_market_edit(index, row) {
-        this.market1 = Object.assign({}, row)
-        this.dialogFormVisible3 = true
+        this.market_id = this.market1[index].market_code
+        this.apiGet('market/get/' + this.market_id).then((res) => {
+          this.handelResponse(res, (data) => {
+            this.market2 = res.data
+            this.get_simple_list()
+            console.log(this.market2)
+          })
+        })
+        this.dialogFormVisible7 = true
+        this.market2 = Object.assign({}, row)
       },
       customer_market_update() {
         this.isLoading = !this.isLoading
-        this.apiPost('market/update', this.market1).then((res) => {
+        this.apiPost('market/update', this.market2).then((res) => {
           this.handelResponse(res, (data) => {
             _g.toastMsg('success', '修改成功')
-            this.customer_read()
-            this.dialogFormVisible3 = false
+            this.customer_market_read()
+            this.dialogFormVisible7 = false
           })
         })
       }

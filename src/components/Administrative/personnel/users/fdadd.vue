@@ -34,6 +34,7 @@
       <el-input v-model="list.f_cashflow_volume" class="h-40 w-200"></el-input>
     </el-form-item>
     <el-form-item>
+      <el-button type="primary" @click="fd_go()">返回</el-button>
       <el-button type="primary" @click="financial_save()">下一步</el-button>
     </el-form-item>
   </el-form>
@@ -82,6 +83,9 @@
           })
         })
       }
+    },
+    fd_go() {
+      this.$router.go(-1)
     },
     created() {
       this.get_id()
