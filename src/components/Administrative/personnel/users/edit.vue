@@ -290,7 +290,7 @@
       </el-table-column>
       <el-table-column label="所属公司" width="">
         <template scope="scope">
-          <span>{{scope.row.company_code}}</span>
+          <span>{{scope.row.company_name}}</span>
         </template>
       </el-table-column>
       <el-table-column label="市场名称"  align="center" width="">
@@ -380,27 +380,59 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item label="授权邮箱">
-                  <el-button type="text" @click="table_market_create_authorize1()">添加</el-button><i class="el-icon-edit"></i>
+                  <el-button type="text" @click="table_market_create_authorize()">添加</el-button><i class="el-icon-edit"></i>
+                  <el-dialog title="邮箱列表" :visible.sync="dialogFormVisible9" append-to-body>
+                    <el-form :model="market4">
+                      <el-form-item label="邮箱选择" :label-width="formLabelWidth">
+                        <el-select v-model="market4.f_authorized" placeholder="请选择">
+                          <el-option
+                            v-for="yx1 in authorize"
+                            :key="yx1.user_code"
+                            :label="yx1.user_email"
+                            :value="yx1">
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                    </el-form>
+                    <div slot="footer" class="dialog-footer">
+                      <el-button @click="dialogFormVisible2 = false">取 消</el-button>
+                      <el-button type="primary" @click="table_market_create_authorize_submit1()">确 定</el-button>
+                    </div>
+                  </el-dialog>
               <el-table
-                :data="market2.authorized_user_codes"
+                :data="authordata1"
                 border
                 style="width:100%">
                 <el-table-column
-                  label="授权邮箱编号"
+                  label="授权邮箱"
                   width="">
                   <template scope="scope">
-                    <span>{{scope.row}}</span>
+                    <span>{{scope.row.user_email}}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  label="邮箱拥有者"
+                  width="">
+                  <template scope="scope">
+                    <span>{{scope.row.user_name}}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  label="邮箱拥有者手机"
+                  width="">
+                  <template scope="scope">
+                    <span>{{scope.row.user_phone}}</span>
                   </template>
                 </el-table-column>
                 <el-table-column align="center"  label="操作" width="">
                     <template scope="scope">                          
-                      <el-button size="mini" @click="table_delete(scope.$index, scope.row)">删除</el-button>            
+                      <el-button size="mini" @click="table_delete1(scope.$index, scope.row)">删除</el-button>            
                     </template>
                 </el-table-column>
               </el-table>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="customer_market_create()">完成</el-button>
+                <el-button type="primary" @click="customer_market_update()">完成</el-button>
               </el-form-item>          
           </el-form>
           </el-dialog>           
@@ -447,6 +479,7 @@
         dialogFormVisible5: false,
         dialogFormVisible6: false,
         dialogFormVisible7: false,
+        dialogFormVisible9: false,
         dialogFormVisible2: false,
         dialogFormVisible3: false,
         companyadd: {
@@ -461,6 +494,9 @@
         list: '',
         company: [],
         company2: {},
+        market5: {
+          f_authorized_user_code: []
+        },
         company1: {
           f_name: '',
           f_en_name: '',
@@ -498,8 +534,12 @@
         market2: '',
         charge: [],
         authordata: [],
+        authordata1: [],
         marketdata: [],
         market3: {
+          f_authorized: ''
+        },
+        market4: {
           f_authorized: ''
         }
       }
@@ -653,10 +693,20 @@
           f_authorized: ''
         }
       },
+      authorize_init1() {
+        this.market4 = {
+          f_authorized: ''
+        }
+      },
       table_market_create_authorize1() {
         this.market3 = {}
         this.authorize_init()
         this.dialogFormVisible6 = true
+      },
+      table_market_create_authorize() {
+        this.market4 = {}
+        this.authorize_init1()
+        this.dialogFormVisible9 = true
       },
       table_market_create_authorize_submit() {
         if (this.authordata.indexOf(this.market3.f_authorized) === -1) {
@@ -666,13 +716,31 @@
           alert('此邮箱已经授权')
         }
       },
+      table_market_create_authorize_submit1() {
+        for (let i = 0; i < this.authordata1.length; i++) {
+          if (this.market4.f_authorized === this.authordata1[i]) {
+            alert('此邮箱已经授权')
+          } else {
+            this.authordata1.push(this.market4.f_authorized)
+            this.dialogFormVisible9 = false
+          }
+        }
+      },
       table_edit(index, row) {
         this.dialogFormVisible6 = true
         this.market3 = Object.assign({}, row)
         this.authordata.splice(index, 1)
       },
+      table_edit1(index, row) {
+        this.dialogFormVisible9 = true
+        this.market4 = Object.assign({}, row)
+        this.authordata1.splice(index, 1)
+      },
       table_delete(index) {
         this.authordata.splice(index, 1)
+      },
+      table_delete1(index) {
+        this.authordata1.splice(index, 1)
       },
       customer_market_create() {
         for (let i = 0; i < this.authordata.length; i++) {
@@ -684,6 +752,7 @@
             _g.toastMsg('success', '编辑成功')
             this.customer_market_read()
             this.dialogFormVisible5 = false
+            this.authordata = []
           })
         })
       },
@@ -693,7 +762,15 @@
           this.handelResponse(res, (data) => {
             this.market2 = res.data
             this.get_simple_list()
-            console.log(this.market2)
+            console.log(res.data.emails_list.length)
+            for (let i = 0; i < res.data.emails_list.length; i++) {
+              for (let j = 0; j <= i; j++) {
+                console.log(res.data.emails_list[i].user_code)
+                if (res.data.authorized_user_codes[j] === res.data.emails_list[i].user_code) {
+                  this.authordata1.push(res.data.emails_list[i])
+                }
+              }
+            }
           })
         })
         this.dialogFormVisible7 = true
@@ -701,11 +778,26 @@
       },
       customer_market_update() {
         this.isLoading = !this.isLoading
-        this.apiPost('market/update', this.market2).then((res) => {
+        this.market5.f_code = this.market2.market_code
+        this.market5.f_group_code = this.market2.group_code
+        this.market5.f_company_code = this.market2.company_code
+        this.market5.f_market_name = this.market2.market_name
+        this.market5.f_currency_name = this.market2.currency_name
+        this.market5.f_currency_sign = this.market2.currency_sign
+        this.market5.f_sync_type = this.market2.sync_type
+        this.market5.f_memo = this.market2.memo
+        this.market5.f_charge_user_name = this.market2.charge_user_name
+        this.market5.f_charge_user_code = this.market2.charge_user_code
+        this.market5.f_status = this.market2.status
+        for (let i = 0; i < this.authordata1.length; i++) {
+          this.market5.f_authorized_user_code.push(this.authordata1[i].user_code)
+        }
+        this.apiPost('market/update', this.market5).then((res) => {
           this.handelResponse(res, (data) => {
             _g.toastMsg('success', '修改成功')
             this.customer_market_read()
             this.dialogFormVisible7 = false
+            this.authordata1 = []
           })
         })
       }
