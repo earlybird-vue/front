@@ -394,7 +394,6 @@
                 </el-table-column>
                 <el-table-column align="center"  label="操作" width="">
                     <template scope="scope">                          
-                      <el-button size="mini" @click="table_edit(scope.$index, scope.row)">编辑</el-button>
                       <el-button size="mini" @click="table_delete(scope.$index, scope.row)">删除</el-button>            
                     </template>
                 </el-table-column>
@@ -458,16 +457,6 @@
         companydata: [],
         id: null,
         company_id: null,
-        options6: [
-          {
-            id: 0,
-            name: '自动更新'
-          },
-          {
-            id: 1,
-            name: '手动更新'
-          }
-        ],
         customer: [],
         list: '',
         company: [],
@@ -491,10 +480,10 @@
           f_authorized_user_code: []
         },
         way: [{
-          id: '0',
+          id: 0,
           name: '自动'
         }, {
-          id: '1',
+          id: 1,
           name: '手动'
         }],
         Cur: [{
