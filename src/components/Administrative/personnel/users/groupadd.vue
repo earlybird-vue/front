@@ -1,12 +1,12 @@
 <template>
 	<el-form :model="list" :rules="rules" ref="list" label-width="100px" class="demo-ruleForm">
-    <el-form-item label="集团名称" prop="f_name" class="h-40 w-300">
+    <el-form-item label="集团名称" prop="f_name" class="h-40 w-300 m-l-300">
       <el-input v-model="list.f_name"></el-input>
     </el-form-item>
-    <el-form-item label="网站" prop="f_web_site" class="h-40 w-300">
+    <el-form-item label="网站" prop="f_web_site" class="h-40 w-300 m-l-300">
       <el-input v-model="list.f_web_site"></el-input>
     </el-form-item>
-    <el-form-item label="行业" prop="f_industry_id">
+    <el-form-item label="行业" prop="f_industry_id" class="h-40 w-300 m-l-300">
       <el-select v-model="list.f_industry_id" placeholder="请选择">
         <el-option
           v-for="item in Industry"
@@ -16,7 +16,7 @@
         </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="国家" prop="f_country_id">
+    <el-form-item label="国家" prop="f_country_id" class="h-40 w-300 m-l-300" >
       <el-select v-model="list.f_country_id" placeholder="请选择">
         <el-option
           v-for="item2 in Country"
@@ -26,16 +26,16 @@
         </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="总机" prop="f_contact_phone" class="h-40 w-300">
-      <el-input v-model="list.f_contact_phone"></el-input>
+    <el-form-item label="总机" prop="f_contact_phone" class="h-40 w-300 m-l-300">
+      <el-input v-model.number="list.f_contact_phone"></el-input>
     </el-form-item>
-    <el-form-item label="集团编号" prop="f_group_number" class="h-40 w-300">
+    <el-form-item label="集团编号" prop="f_group_number" class="h-40 w-300 m-l-300">
       <el-input v-model="list.f_group_number"></el-input>
     </el-form-item>
-    <el-form-item label="地址" prop="f_address" class="h-40 w-300">
+    <el-form-item label="地址" prop="f_address" class="h-40 w-300 m-l-300">
       <el-input v-model="list.f_address"></el-input>
     </el-form-item>
-    <el-form-item label="公司类型" prop="f_type_id">
+    <el-form-item label="公司类型" prop="f_type_id" class="h-40 w-300 m-l-300">
       <el-select v-model="list.f_type_id" placeholder="请选择">
         <el-option
           v-for="item3 in Type"
@@ -45,11 +45,11 @@
         </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="财年截至时间" class="h-40 w-300">
+    <el-form-item label="财年截至时间" prop="f_fiscal_month" class="h-40 w-300 m-l-300" label-width="130px">
       <el-input v-model="list.f_fiscal_month"></el-input>
     </el-form-item>
     <el-form-item> 
-      <el-button type="primary" @click="submitForm('list')" :loading="isLoading">下一步</el-button>
+      <el-button type="primary" @click="submitForm('list')" class="m-l-300">下一步</el-button>
     </el-form-item>
 	</el-form>  
 </template>
@@ -59,6 +59,22 @@
 
   export default {
     data() {
+      let validwebsite = (rule, value, callback) => {
+        let reg = /^((https|http|ftp|rtsp|mms){0,1}(:\/\/){0,1})www\.(([A-Za-z0-9-~]+)\.)+([A-Za-z0-9-~\/])+$/
+        if (!reg.test(value)) {
+          callback(new Error('请输入正确的网址'))
+        } else {
+          callback()
+        }
+      }
+      let validfiscal = (rule, value, callback) => {
+        let reg = /^([1-9]\d?|12)$/
+        if (!reg.test(value)) {
+          callback(new Error('请输入截至月份'))
+        } else {
+          callback()
+        }
+      }
       return {
         isLoading: false,
         Industry: '',
@@ -81,7 +97,8 @@
             { required: true, message: '请输入集团名称', trigger: 'blur' }
           ],
           f_web_site: [
-            { required: true, message: '请输入集团网站', trigger: 'blur' }
+            { required: true, message: '请输入集团网站', trigger: 'blur' },
+            { validator: validwebsite, trigger: 'blur' }
           ],
           f_group_number: [
             { required: true, message: '请输入集团编号', trigger: 'blur' }
@@ -93,13 +110,18 @@
             { type: 'number', required: true, message: '请选择国家', trigger: 'change' }
           ],
           f_contact_phone: [
-            { required: true, message: '请输入总机', trigger: 'blur' }
+            { required: true, message: '请输入电话', trigger: 'blur' },
+            { type: 'number', message: '请输入数字', trigger: 'blur' }
           ],
           f_address: [
             { required: true, message: '请输入地址', trigger: 'blur' }
           ],
           f_type_id: [
             { type: 'number', required: true, message: '请选择公司类型', trigger: 'change' }
+          ],
+          f_fiscal_month: [
+            { required: true, message: '请填写截至时间', trigger: 'blur' },
+            { validator: validfiscal, trigger: 'blur' }
           ]
         }
       }
@@ -119,11 +141,11 @@
           if (valid) {
             this.apiPost('group/create', this.list).then((res) => {
               this.handelResponse(res, (data) => {
-                _g.toastMsg('success', '编辑成功')
+                _g.toastMsg('success', '添加成功')
                 this.group_id = res.data.code
-                this.$router.push({ name: 'contactAdd', params: { id: res.data.code }})
-                console.log(this.$route.params.id)
               })
+              this.$router.push({ name: 'contactAdd', params: { id: res.data.code }})
+              console.log(this.$route.params.id)
             })
           }
         })

@@ -1,25 +1,26 @@
 <template>
+<div>
 	<div class="header">
     联系人信息
-    <el-button class="add" size="mini" @click="contact_table_create()"><i class="el-icon-plus">添加</i></el-button>
+    <el-button class="add m-l-860" @click="contact_table_create()"><i class="el-icon-plus">添加</i></el-button></div>
     <el-dialog title="联系人信息" :visible.sync="dialogFormVisible">
-      <el-form ref="list" :model="list" label-width="100px">
-        <el-form-item label="姓" :label-width="formLabelWidth">
+      <el-form ref="list" :model="list" :rules="rules" label-width="100px">
+        <el-form-item label="姓" :label-width="formLabelWidth" prop="f_last_name">
           <el-input v-model="list.f_last_name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="名" :label-width="formLabelWidth">
+        <el-form-item label="名" :label-width="formLabelWidth" prop="f_first_name">
           <el-input v-model="list.f_first_name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="职位" :label-width="formLabelWidth">
+        <el-form-item label="职位" :label-width="formLabelWidth" prop="f_user_position">
           <el-input v-model="list.f_user_position" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="电话" :label-width="formLabelWidth">
+        <el-form-item label="电话" :label-width="formLabelWidth" prop="f_user_phone">
           <el-input v-model="list.f_user_phone" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" :label-width="formLabelWidth">
+        <el-form-item label="邮箱" :label-width="formLabelWidth" prop="f_user_email">
           <el-input v-model="list.f_user_email" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="相关" :label-width="formLabelWidth">
+        <el-form-item label="相关" :label-width="formLabelWidth" prop="f_user_role">
           <el-checkbox-group v-model="list.f_user_role" @change="handleCheckedRolesChange">
             <el-checkbox v-for="item in roles" :label="item.id" :key="item.id">{{item.name}}</el-checkbox>
           </el-checkbox-group>
@@ -66,9 +67,9 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-button type="primary" @click="contact_create()">下一步</el-button>
+    <el-button type="primary" @click="contact_create('list')">下一步</el-button>
     <el-button type="primary" @click="contact_go()">返回</el-button>
-  </div> 
+</div>
 </template>
 <script>
   import http from '../../../../assets/js/http'
@@ -76,6 +77,14 @@
 
   export default {
     data() {
+      let validphone = (rule, value, callback) => {
+        let reg = /^1(3|4|5|7|8)[0-9]{9}$/
+        if (!reg.test(value)) {
+          callback(new Error('您输入的电话号码有误'))
+        } else {
+          callback()
+        }
+      }
       return {
         roles: [{
           id: 'enterprise',
@@ -98,6 +107,27 @@
           f_user_email: '',
           f_user_role: [],
           f_group_code: ''
+        },
+        rules: {
+          f_last_name: [
+            { required: true, message: '请输入姓氏', trigger: 'blur' }
+          ],
+          f_first_name: [
+            { required: true, message: '请输入名字', trigger: 'blur' }
+          ],
+          f_user_position: [
+            { required: true, message: '请输入职位', trigger: 'blur' }
+          ],
+          f_user_phone: [
+            { required: true, message: '请输入电话', trigger: 'blur' },
+            { validator: validphone, trigger: 'blur' }
+          ],
+          f_user_email: [
+            { type: 'email', required: true, message: '请填写邮箱', trigger: 'blur' }
+          ],
+          f_user_role: [
+            { required: true, message: '请选择相关负责人', trigger: 'change' }
+          ]
         }
       }
     },
@@ -142,13 +172,17 @@
       table_delete(index, row) {
         this.listdata.splice(index, 1)
       },
-      contact_create() {
-        this.apiPost('contact/create', this.listdata).then((res) => {
-          this.handelResponse(res, (data) => {
-            console.log(this.listdata)
-            _g.toastMsg('success', '编辑成功')
-            this.$router.push({ name: 'fdAdd', params: { id: this.listdata[0].f_group_code }})
-          })
+      contact_create(list) {
+        this.$refs[list].validate((valid) => {
+          if (valid) {
+            this.apiPost('contact/create', this.listdata).then((res) => {
+              this.handelResponse(res, (data) => {
+                console.log(this.listdata)
+                _g.toastMsg('success', '添加成功')
+                this.$router.push({ name: 'fdAdd', params: { id: this.listdata[0].f_group_code }})
+              })
+            })
+          }
         })
       },
       contact_go() {
