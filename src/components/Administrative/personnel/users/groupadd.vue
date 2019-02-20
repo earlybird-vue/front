@@ -115,7 +115,6 @@
         })
       },
       submitForm(list) {
-        this.isLoading = !this.isLoading
         this.$refs[list].validate((valid) => {
           if (valid) {
             this.apiPost('group/create', this.list).then((res) => {
@@ -125,8 +124,6 @@
                 this.$router.push({ name: 'contactAdd', params: { id: res.data.code }})
                 console.log(this.$route.params.id)
               })
-            }, () => {
-              this.isLoading = !this.isLoading
             })
           }
         })

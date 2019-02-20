@@ -1012,6 +1012,7 @@
         this.apiGet('market/get/' + this.market_id).then((res) => {
           this.handelResponse(res, (data) => {
             this.market2 = res.data
+            console.log(this.market2)
             this.get_simple_list()
             this.authordata1 = []
             for (let i = 0; i < res.data.emails_list.length; i++) {
