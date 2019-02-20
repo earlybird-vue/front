@@ -45,16 +45,16 @@ const routes = [
     path: '/home',
     component: Home,
     children: [
-      { path: 'menu/list', component: menuList, name: 'menuList', meta: { hideLeft: false, module: 'Administrative', menu: 'menu', keepAlive: false }},
-      { path: 'menu/add', component: menuAdd, name: 'menuAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'menu', keepAlive: false }},
-      { path: 'menu/edit/:id', component: menuEdit, name: 'menuEdit', meta: { hideLeft: false, module: 'Administrative', menu: 'menu', keepAlive: false }}
+      { path: 'menu/list', component: menuList, name: 'menuList', meta: { hideLeft: false, module: 'Administrative', menu: 'menu' }},
+      { path: 'menu/add', component: menuAdd, name: 'menuAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'menu' }},
+      { path: 'menu/edit/:id', component: menuEdit, name: 'menuEdit', meta: { hideLeft: false, module: 'Administrative', menu: 'menu' }}
     ]
   },
   {
     path: '/home',
     component: Home,
     children: [
-      { path: 'config/add', component: systemConfig, name: 'systemConfig', meta: { hideLeft: false, module: 'Administrative', menu: 'systemConfig', keepAlive: false }}
+      { path: 'config/add', component: systemConfig, name: 'systemConfig', meta: { hideLeft: false, module: 'Administrative', menu: 'systemConfig' }}
     ]
   },
 
@@ -62,49 +62,49 @@ const routes = [
     path: '/home',
     component: Home,
     children: [
-      { path: 'rule/list', component: ruleList, name: 'ruleList', meta: { hideLeft: false, module: 'Administrative', menu: 'rule', keepAlive: false }},
-      { path: 'rule/add', component: ruleAdd, name: 'ruleAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'rule', keepAlive: false }},
-      { path: 'rule/edit/:id', component: ruleEdit, name: 'ruleEdit', meta: { hideLeft: false, module: 'Administrative', menu: 'rule', keepAlive: false }}
+      { path: 'rule/list', component: ruleList, name: 'ruleList', meta: { hideLeft: false, module: 'Administrative', menu: 'rule' }},
+      { path: 'rule/add', component: ruleAdd, name: 'ruleAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'rule' }},
+      { path: 'rule/edit/:id', component: ruleEdit, name: 'ruleEdit', meta: { hideLeft: false, module: 'Administrative', menu: 'rule' }}
     ]
   },
   {
     path: '/home',
     component: Home,
     children: [
-      { path: 'position/list', component: positionList, name: 'positionList', meta: { hideLeft: false, module: 'Administrative', menu: 'position', keepAlive: false }},
-      { path: 'position/add', component: positionAdd, name: 'positionAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'position', keepAlive: false }},
-      { path: 'position/edit/:id', component: positionEdit, name: 'positionEdit', meta: { hideLeft: false, module: 'Administrative', menu: 'position', keepAlive: false }}
+      { path: 'position/list', component: positionList, name: 'positionList', meta: { hideLeft: false, module: 'Administrative', menu: 'position' }},
+      { path: 'position/add', component: positionAdd, name: 'positionAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'position' }},
+      { path: 'position/edit/:id', component: positionEdit, name: 'positionEdit', meta: { hideLeft: false, module: 'Administrative', menu: 'position' }}
     ]
   },
   {
     path: '/home',
     component: Home,
     children: [
-      { path: 'structures/list', component: structuresList, name: 'structuresList', meta: { hideLeft: false, module: 'Administrative', menu: 'structures', keepAlive: false }},
-      { path: 'structures/add', component: structuresAdd, name: 'structuresAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'structures', keepAlive: false }},
-      { path: 'structures/edit/:id', component: structuresEdit, name: 'structuresEdit', meta: { hideLeft: false, module: 'Administrative', menu: 'structures', keepAlive: false }}
+      { path: 'structures/list', component: structuresList, name: 'structuresList', meta: { hideLeft: false, module: 'Administrative', menu: 'structures' }},
+      { path: 'structures/add', component: structuresAdd, name: 'structuresAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'structures' }},
+      { path: 'structures/edit/:id', component: structuresEdit, name: 'structuresEdit', meta: { hideLeft: false, module: 'Administrative', menu: 'structures' }}
     ]
   },
   {
     path: '/home',
     component: Home,
     children: [
-      { path: 'groups/list', component: groupsList, name: 'groupsList', meta: { hideLeft: false, module: 'Administrative', menu: 'groups', keepAlive: false }},
-      { path: 'groups/add', component: groupsAdd, name: 'groupsAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'groups', keepAlive: false }},
-      { path: 'groups/edit/:id', component: groupsEdit, name: 'groupsEdit', meta: { hideLeft: false, module: 'Administrative', menu: 'groups', keepAlive: false }}
+      { path: 'groups/list', component: groupsList, name: 'groupsList', meta: { hideLeft: false, module: 'Administrative', menu: 'groups' }},
+      { path: 'groups/add', component: groupsAdd, name: 'groupsAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'groups' }},
+      { path: 'groups/edit/:id', component: groupsEdit, name: 'groupsEdit', meta: { hideLeft: false, module: 'Administrative', menu: 'groups' }}
     ]
   },
   {
     path: '/home',
     component: Home,
     children: [
-      { path: 'users/list', component: usersList, name: 'usersList', meta: { hideLeft: false, module: 'Administrative', menu: 'users', keepAlive: false }},
-      { path: 'users/groupadd', component: groupAdd, name: 'groupAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'users', keepAlive: true }},
-      { path: 'users/contactadd', component: contactAdd, name: 'contactAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'users', keepAlive: true }},
+      { path: 'users/list', component: usersList, name: 'usersList', meta: { hideLeft: false, module: 'Administrative', menu: 'users' }},
+      { path: 'users/groupadd', component: groupAdd, name: 'groupAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'users' }},
+      { path: 'users/contactadd', component: contactAdd, name: 'contactAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'users' }},
       { path: 'users/fdadd', component: fdAdd, name: 'fdAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'users' }},
-      { path: 'users/companyadd', component: companyAdd, name: 'companyAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'users', keepAlive: true }},
-      { path: 'users/marketadd', component: marketAdd, name: 'marketAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'users', keepAlive: false }},
-      { path: 'users/edit/:id', component: usersEdit, name: 'usersEdit', meta: { hideLeft: false, module: 'Administrative', menu: 'users', keepAlive: false }}
+      { path: 'users/companyadd', component: companyAdd, name: 'companyAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'users' }},
+      { path: 'users/marketadd', component: marketAdd, name: 'marketAdd', meta: { hideLeft: false, module: 'Administrative', menu: 'users' }},
+      { path: 'users/edit/:id', component: usersEdit, name: 'usersEdit', meta: { hideLeft: false, module: 'Administrative', menu: 'users' }}
     ]
   }
 ]
