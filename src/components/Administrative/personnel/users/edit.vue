@@ -1082,6 +1082,7 @@
           this.handelResponse(res, (data) => {
             _g.toastMsg('success', '添加成功')
             this.dialogFormVisible10 = false
+            this.get_contact_list()
           })
         })
       },
