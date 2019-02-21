@@ -26,7 +26,7 @@
           </el-checkbox-group>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="contact_table_create_submit()">确定</el-button>
+          <el-button type="primary" @click="contact_table_create_submit('list')">确定</el-button>
           <el-button type="primary" @click="contact_table_cancel()">取消</el-button>
         </el-form-item>
       </el-form>   
@@ -63,11 +63,39 @@
       <el-table-column align="center"  label="操作" width="150">
         <template scope="scope">                          
           <el-button size="mini" @click="table_edit(scope.$index, scope.row)">编辑</el-button>
+          <el-dialog title="联系人信息" :visible.sync="dialogFormVisible2">
+            <el-form ref="list" :model="list1" :rules="rules" label-width="100px">
+              <el-form-item label="姓" :label-width="formLabelWidth" prop="f_last_name">
+                <el-input v-model="list1.f_last_name" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="名" :label-width="formLabelWidth" prop="f_first_name">
+                <el-input v-model="list1.f_first_name" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="职位" :label-width="formLabelWidth" prop="f_user_position">
+                <el-input v-model="list1.f_user_position" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="电话" :label-width="formLabelWidth" prop="f_user_phone">
+                <el-input v-model="list1.f_user_phone" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="邮箱" :label-width="formLabelWidth" prop="f_user_email">
+                <el-input v-model="list1.f_user_email" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="相关" :label-width="formLabelWidth" prop="f_user_role">
+                <el-checkbox-group v-model="list1.f_user_role" @change="handleCheckedRolesChange">
+                  <el-checkbox v-for="item in roles" :label="item.id" :key="item.id">{{item.name}}</el-checkbox>
+                </el-checkbox-group>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="contact_table_update_submit('list')">确定</el-button>
+                <el-button type="primary" @click="contact_table_cancel()">取消</el-button>
+              </el-form-item>
+            </el-form>   
+          </el-dialog>
           <el-button size="mini" type="danger" @click="table_delete(scope.$index, scope.row)">删除</el-button>           
         </template>
       </el-table-column>
     </el-table>
-    <el-button type="primary" @click="contact_create('list')">下一步</el-button>
+    <el-button type="primary" @click="contact_create()">下一步</el-button>
     <el-button type="primary" @click="contact_go()">返回</el-button>
 </div>
 </template>
@@ -97,6 +125,8 @@
           name: '清算负责人'
         }],
         dialogFormVisible: false,
+        dialogFormVisible2: false,
+        index: null,
         checkedRoles: [],
         listdata: [],
         list: {
@@ -108,6 +138,7 @@
           f_user_role: [],
           f_group_code: ''
         },
+        list1: '',
         rules: {
           f_last_name: [
             { required: true, message: '请输入姓氏', trigger: 'blur' }
@@ -157,32 +188,41 @@
         this.list = {}
         this.dialogFormVisible = false
       },
-      contact_table_create_submit() {
-        this.listdata.push(this.list)
-        this.dialogFormVisible = false
-        console.log(this.listdata)
-        console.log(this.list.f_group_code)
+      contact_table_create_submit(list) {
+        this.$refs[list].validate((valid) => {
+          if (valid) {
+            this.listdata.push(this.list)
+            this.dialogFormVisible = false
+            console.log(this.listdata)
+            console.log(this.list.f_group_code)
+          }
+        })
+      },
+      contact_table_update_submit(list) {
+        this.$refs[list].validate((valid) => {
+          if (valid) {
+            this.listdata.splice(this.index, 1)
+            this.listdata.push(this.list1)
+            this.dialogFormVisible2 = false
+          }
+        })
       },
       table_edit(index, row) {
-        this.dialogFormVisible = true
-        this.list = Object.assign({}, row)
-        this.listdata.splice(index, 1)
+        this.dialogFormVisible2 = true
+        this.list1 = Object.assign({}, row)
+        this.index = index
         this.get_id()
       },
       table_delete(index, row) {
         this.listdata.splice(index, 1)
       },
-      contact_create(list) {
-        this.$refs[list].validate((valid) => {
-          if (valid) {
-            this.apiPost('contact/create', this.listdata).then((res) => {
-              this.handelResponse(res, (data) => {
-                console.log(this.listdata)
-                _g.toastMsg('success', '添加成功')
-                this.$router.push({ name: 'fdAdd', params: { id: this.listdata[0].f_group_code }})
-              })
-            })
-          }
+      contact_create() {
+        this.apiPost('contact/create', this.listdata).then((res) => {
+          this.handelResponse(res, (data) => {
+            console.log(this.listdata)
+            _g.toastMsg('success', '添加成功')
+            this.$router.push({ name: 'fdAdd', params: { id: this.listdata[0].f_group_code }})
+          })
         })
       },
       contact_go() {

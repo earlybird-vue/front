@@ -1,7 +1,7 @@
 <template>
-  <el-form ref="form" :model="list" label-width="130px">
-    <el-form-item label="年销售额">
-      <el-select v-model="list.f_sale_volume_id" placeholder="请选择">
+  <el-form ref="list" :model="list" label-width="400px" :rules="rules">
+    <el-form-item label="年销售额" prop="f_sale_volume_id">
+      <el-select v-model="list.f_sale_volume_id" placeholder="请选择" width="300">
         <el-option
           v-for="item4 in ext"
           :key="item4.id"
@@ -9,9 +9,11 @@
           :value="item4.id">
         </el-option>
       </el-select>
-      <el-input v-model="list.f_sale_volume" class="h-40 w-200"></el-input>
     </el-form-item>
-    <el-form-item label="年采购额">
+    <el-form-item prop="f_sale_volume">
+      <el-input class="w-200" v-model.number="list.f_sale_volume"></el-input>
+    </el-form-item>
+    <el-form-item label="年采购额" prop="f_purhchase_volume_id" class="m-t-20">
       <el-select v-model="list.f_purhchase_volume_id" placeholder="请选择">
         <el-option
           v-for="item4 in ext"
@@ -20,9 +22,11 @@
           :value="item4.id">
         </el-option>
       </el-select>
-      <el-input v-model="list.f_purhchase_volume" class="h-40 w-200"></el-input>
     </el-form-item>
-    <el-form-item label="现金流情况">
+    <el-form-item prop="f_purhchase_volume">
+      <el-input class="w-200" v-model.number="list.f_purhchase_volume"></el-input>
+    </el-form-item>
+    <el-form-item label="现金流情况" prop="f_cashflow_volume_id">
       <el-select v-model="list.f_cashflow_volume_id" placeholder="请选择">
         <el-option
           v-for="item4 in ext"
@@ -31,11 +35,13 @@
           :value="item4.id">
         </el-option>
       </el-select>
-      <el-input v-model="list.f_cashflow_volume" class="h-40 w-200"></el-input>
+    </el-form-item>
+    <el-form-item prop="f_cashflow_volume">
+      <el-input class="w-200" v-model.number="list.f_cashflow_volume"></el-input>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="fd_go()">返回</el-button>
-      <el-button type="primary" @click="financial_save()">下一步</el-button>
+      <el-button type="primary" @click="financial_save('list')">下一步</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -67,6 +73,26 @@
           f_purhchase_volume: '',
           f_cashflow_volume_id: '',
           f_cashflow_volume: ''
+        },
+        rules: {
+          f_sale_volume_id: [
+            { required: true, message: '请选择销售额范围', trigger: 'change' }
+          ],
+          f_sale_volume: [
+            { type: 'number', required: true, message: '请输入销售额', trigger: 'blur' }
+          ],
+          f_purhchase_volume_id: [
+            { required: true, message: '请选择采购额范围', trigger: 'change' }
+          ],
+          f_purhchase_volume: [
+            { type: 'number', required: true, message: '请输入采购额', trigger: 'blur' }
+          ],
+          f_cashflow_volume_id: [
+            { required: true, message: '请选择现金流动范围', trigger: 'change' }
+          ],
+          f_cashflow_volume: [
+            { type: 'number', required: true, message: '请输入流动额度', trigger: 'blur' }
+          ]
         }
       }
     },
@@ -75,12 +101,16 @@
         this.list.f_group_code = this.$route.params.id
         console.log(this.list.f_group_code)
       },
-      financial_save() {
-        this.apiPost('finance/create', this.list).then((res) => {
-          this.handelResponse(res, (data) => {
-            _g.toastMsg('success', '编辑成功')
-            this.$router.push({ name: 'companyAdd', params: { id: res.data.group_code }})
-          })
+      financial_save(list) {
+        this.$refs[list].validate((valid) => {
+          if (valid) {
+            this.apiPost('finance/create', this.list).then((res) => {
+              this.handelResponse(res, (data) => {
+                _g.toastMsg('success', '添加成功')
+                this.$router.push({ name: 'companyAdd', params: { id: res.data.group_code }})
+              })
+            })
+          }
         })
       }
     },
